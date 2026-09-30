@@ -23,4 +23,8 @@ PROJECT_DRIVE_BASE=/project-drive-demo/ npm exec -- vite preview --config demos/
 
 推送 `main` 会触发 [Deploy project drive demo](https://github.com/GUAJIUKE/project-drive-demo/actions/workflows/deploy-demo.yml)。也可在 Actions 选择此工作流 → Run workflow → main，手动重新发布当前产物。Pages 的 Source 使用 GitHub Actions；工作流仅上传 `site/`，使用 `github-pages` 环境。构建发生在原项目环境，Actions 负责检查并发布产物，不从私有源码仓库拉取源码。
 
-发布后应确认工作流的 deploy 成功，再打开首页并刷新，检查头像、CSS、文件操作和身份切换。线上地址只有在部署成功后才可用。此工作流与正式 tasks 发布流程无关联。
+发布后应确认工作流的 deploy 成功，再打开首页并刷新，检查头像、CSS、文件操作和身份切换。此工作流与正式 tasks 发布流程无关联。
+
+## 发布验证（2026-09-30）
+
+[首次部署成功](https://github.com/GUAJIUKE/project-drive-demo/actions/runs/36660651752)。独立 Vite 构建和 12 项模拟测试通过；桌面浏览器检查 1920×1080、1366×768，验证首页与刷新、项目切换、普通成员与 admin 展示边界、容量异常、重命名、移动和替换。普通说明、所选清单及全部清单下载均已操作并检查 TXT 内容；全部下载不受搜索条件影响。线上 HTML、JS、CSS 和 WebP 均返回 HTTP 200，控制台无 error/warn。未访问或测试生产后端。
