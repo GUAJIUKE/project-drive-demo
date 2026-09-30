@@ -1,0 +1,55 @@
+name: Deploy project drive demo
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/deploy-demo.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-drive-pages
+  cancel-in-progress: false
+
+jobs:
+  artifact:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate static demo artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/index.html
+          test -z "$(find site -type l -print)"
+          while IFS= read -r file; do
+            case "$file" in
+              site/index.html|site/assets/*.js|site/assets/*.css|site/assets/*.webp) ;;
+              *) echo "Unexpected file in static artifact: $file"; exit 1 ;;
+            esac
+          done < <(find site -type f)
+          grep -q '/project-drive-demo/assets/' site/index.html
+          test "$(du -sk site | cut -f1)" -lt 10240
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: artifact
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy demo
+        id: deployment
+        uses: actions/deploy-pages@v4
